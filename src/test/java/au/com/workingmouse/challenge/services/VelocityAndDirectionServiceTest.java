@@ -99,6 +99,7 @@ class VelocityAndDirectionServiceTest {
     @Test
     void parseMultipleLinesTest() {
        var lines = VelocityAndDirectionService.parseLines(Arrays.asList(
+    		   "Header", 
                 VALID_LINE,
                 VALID_LINE
         ));
@@ -110,9 +111,7 @@ class VelocityAndDirectionServiceTest {
     }
 
     @Test
-    void summeriseTest() {
-        // Implementation instructions unclear. What should this test?
-        // Summarise spelt wrong
+    void summeriseTest() throws IllegalArgumentException, IllegalAccessException {
         VelocityAndDirectionData actualVelocityAndDirectionData = VelocityAndDirectionService.parseLine(VALID_LINE);
         List<VelocityAndDirectionData> dataToSummarise = new ArrayList<>();
         List<VelocityAndDirectionData> actualDataToSummarise = new ArrayList<>();

@@ -15,6 +15,9 @@ public class Configuration {
 
     @Getter
     private static File importFile;
+    
+    @Getter
+    private static String webAddress;
 
     public static void load() {
 
@@ -29,6 +32,8 @@ public class Configuration {
 
             // load a properties file
             properties.load(input);
+            
+            webAddress = new String(properties.getProperty("webdata.address"));
 
             importFile = new File(classLoader.getResource(properties.getProperty("csv.file.path")).getFile());
 

@@ -16,7 +16,9 @@ public class VelocityAndDirectionService {
 
         VelocityAndDirectionData velocityAndDirectionData = new VelocityAndDirectionData();
 
-        velocityAndDirectionData.setTimestamp(Timestamp.valueOf(parts[0]));
+        String timestamp = parts[0].replaceAll("^\"|\"$", "");
+        
+        velocityAndDirectionData.setTimestamp(Timestamp.valueOf(timestamp));
         velocityAndDirectionData.setRecord(Integer.parseInt(parts[1]));
         velocityAndDirectionData.setDcsModel(Integer.parseInt(parts[2]));
         velocityAndDirectionData.setDcsSerial(Integer.parseInt(parts[3]));
@@ -79,29 +81,120 @@ public class VelocityAndDirectionService {
                 // Skip header
                 continue;
             }
+            int i = 0;
             parsedLines.add(VelocityAndDirectionService.parseLine(line));
         }
 
         return parsedLines;
     }
+    /**
+     * Takes in the full velocityAndDirectionDataset and calculates the sum for each column
+     * (excluding timestamps)
+     * Returns a velocityAndDirectionData object containing the sums.
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
+     * 
+     */
+    
+    public static VelocityAndDirectionData sumVelocityAndDirectionData(List<VelocityAndDirectionData> velocityAndDirectionDataset) throws IllegalArgumentException, IllegalAccessException{
+
+    	VelocityAndDirectionData velocityAndDirectionTotals = new VelocityAndDirectionData();    	
+
+    	for(VelocityAndDirectionData velocityAndDirectionData: velocityAndDirectionDataset) {
+	    	Field[] fields = velocityAndDirectionData.getClass().getDeclaredFields();
+
+			 for ( Field field : fields  ) {
+				 
+				 if (!Timestamp.class.isAssignableFrom(field.getType())) { //ignore timestamps
+					 field.setAccessible(true);
+					 
+					 if (Integer.class.isAssignableFrom(field.getType())) {
+						 if (field.get(velocityAndDirectionTotals) == null) {
+							 field.set(velocityAndDirectionTotals,0); // initalise with an integer
+						 }
+						 field.set(velocityAndDirectionTotals, (Integer) field.get(velocityAndDirectionData) + (Integer) field.get(velocityAndDirectionTotals)) ;
+					 }
+					 if (Double.class.isAssignableFrom(field.getType())) {
+			
+						 if (field.get(velocityAndDirectionTotals) == null) {
+							 field.set(velocityAndDirectionTotals,0.0); // initalise with a double
+			    		}
+						field.set(velocityAndDirectionTotals, (Double) field.get(velocityAndDirectionData) + (Double) field.get(velocityAndDirectionTotals));
+					 }
+				 }
+			 }	  
+    	}
+    	return velocityAndDirectionTotals;
+    }
+    
+    /**
+     * Takes in the sum of the velocityAndDirectionDataset and calculates the average for each column
+     * (excluding timestamps)
+     * Returns a velocityAndDirectionData object containing the averages.
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
+     * 
+     */	
+ 
+    public static VelocityAndDirectionData averageSummedVelocityAndDirectionData(VelocityAndDirectionData velocityAndDirectionTotals, int datasetSize) throws IllegalArgumentException, IllegalAccessException{
+    	
+    	VelocityAndDirectionData velocityAndDirectionAverages = new VelocityAndDirectionData();  
+
+    	Field[] fields = velocityAndDirectionTotals.getClass().getDeclaredFields();
+		 for ( Field field : fields  ) {
+			 
+			 if (!Timestamp.class.isAssignableFrom(field.getType())) {
+				 field.setAccessible(true);
+				 //initalise with an integer and set correct field by dividing sum by dataset size
+				 if (Integer.class.isAssignableFrom(field.getType())) {
+					 field.set(velocityAndDirectionAverages,0);
+					 field.set(velocityAndDirectionAverages, (Integer) field.get(velocityAndDirectionTotals) / datasetSize );
+				 }//initalise with a double and set correct field by dividing sum by dataset size
+				 if (Double.class.isAssignableFrom(field.getType())) {
+					 field.set(velocityAndDirectionAverages,0.0);
+					 field.set(velocityAndDirectionAverages, (Double) field.get(velocityAndDirectionTotals) / datasetSize );
+				 } 
+			  }	 
+		  }
+		return velocityAndDirectionAverages;	
+    }
+    
+    
+    
+    
+    public static VelocityAndDirectionData calculateAverages (List<VelocityAndDirectionData> velocityAndDirectionDataset) throws IllegalArgumentException, IllegalAccessException{
+    	int datasetSize = velocityAndDirectionDataset.size();
+    	VelocityAndDirectionData velocityAndDirectionTotals = sumVelocityAndDirectionData(velocityAndDirectionDataset);
+    	VelocityAndDirectionData velocityAndDirectionAverages = averageSummedVelocityAndDirectionData(velocityAndDirectionTotals, datasetSize);
+    	return velocityAndDirectionAverages;
+    	
+    }
 
 
-    public static String summarise(List<VelocityAndDirectionData> velocityAndDirectionDataset) {
+    public static String summarise(List<VelocityAndDirectionData> velocityAndDirectionDataset) throws IllegalArgumentException, IllegalAccessException{
         Integer totalLines = velocityAndDirectionDataset.size();
-
+        VelocityAndDirectionData velocityAndDirectionAverages = velocityAndDirectionDataset.get(velocityAndDirectionDataset.size()-1);
         var summaryBuilder = new StringBuilder() ;
 
-        // Transform dataset to be listed in columns rather than rows
+        
+        String averages = "";
+        //Read averages from fields and add them to the string.
+    	Field[] fields = velocityAndDirectionAverages.getClass().getDeclaredFields();
+			for ( Field field : fields  ) {
+				 if (!Timestamp.class.isAssignableFrom(field.getType())) {
+					 field.setAccessible(true);
+					 averages += "<br/>"+field.getName() + ": " + field.get(velocityAndDirectionAverages).toString();
+				 }
+			}
 
         summaryBuilder.append("<head></head>")
                 .append("<body>")
                 .append("<h2>Summary</h2>")
                 .append("<br />")
                 .append("<strong>Total Lines:</strong>" + totalLines.toString())
-                .append("<p>");  // Add p element to HTML for displaying averages
-
-        // TODO: You will also have to do some work here to ensure the details are complete.
-        summaryBuilder.append("</p>")
+                .append("<p>")  // Add p element to HTML for displaying averages
+        		.append(averages)
+        		.append("</p>")
                 .append("</body>");
 
         return summaryBuilder.toString();
