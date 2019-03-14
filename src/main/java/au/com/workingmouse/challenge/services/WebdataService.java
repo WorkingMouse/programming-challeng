@@ -29,7 +29,7 @@ public class WebdataService{
 		int limit = 0;
 		
 		List<String> webData = new ArrayList<>();
-		String params = "&records_format=csv";
+		String params = "&records_format=csv&sort=RECORD";
 
 		boolean gotData = false;
 		

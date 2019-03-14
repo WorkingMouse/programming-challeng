@@ -51,7 +51,7 @@ class MainTest extends Main {
 	}
 	
 	@Test
-	void retrieveAndParseWebDataTest() throws IOException {
+	void retrieveAndParseWebDataTest() throws IOException, NumberFormatException, InterruptedException {
 		Configuration.load();
 		File filename = Configuration.getImportFile();
 		var addr = Configuration.getWebAddress();

@@ -36,7 +36,7 @@ public class Main {
 
 			var addr = Configuration.getWebAddress();
 
-			var lines = retrieveAndParseWebData(addr, 500);
+			var lines = retrieveAndParseWebData(addr, 0);
 			
 			var averages = VelocityAndDirectionService.calculateAverages(lines);
 			
@@ -53,7 +53,7 @@ public class Main {
 	}
 	
 
-	protected static List<VelocityAndDirectionData> retrieveAndParseWebData(String addr, int limit) throws IOException {
+	protected static List<VelocityAndDirectionData> retrieveAndParseWebData(String addr, int limit) throws IOException, NumberFormatException, InterruptedException {
 		List<String> rawLines = WebdataService.retrieveWebdata(addr, limit);
 		List<String> lines = WebdataService.processWebData(rawLines);
 		
