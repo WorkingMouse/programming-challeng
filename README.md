@@ -50,7 +50,7 @@ __NOTE:__ This activity makes use of a library called Lombok to reduce boiler pl
 
 ## Task 
 
-1. Fork the repository
+1. Clone the repository
 
 2. Fix the tests for the existing application to ensure that it is working correctly, we do not expect this to take more than a couple of minutes.
 
