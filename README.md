@@ -94,4 +94,4 @@ __YOU WILL NOT BE ABLE TO PUSH DIRECTLY TO THIS REPOSITORY!!__
 3. Complete your solution, feel free to add and commit to your local repository. Feel free to google this or have a look at one of the many guides available like http://git.huit.harvard.edu/guide/
 4 Make sure both your solution and the output index.html file are included. 
 5. Create a patch of your work by running ``git diff master..firstname_lastname > firstname_lastname.patch``
-6. Email your new patch file (``firstname_lastname.patch``) to serena@codebots.com
+6. Email your new patch file (``firstname_lastname.patch``) to [hr@workingmouse.com.au](mailto:hr@workingmouse.com.au).
